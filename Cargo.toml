@@ -5,7 +5,24 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+#adding a library to our project; Cargo default behavior is to look for src/main.rs and call binary package package.field, which is currently 'Zero2Prod'
+#program logic lives in lib.rs; binary will be an entrypoint within main function of main.rs
+##cargo run still runs application currently in main.rs
+[lib]
+path = "src/lib.rs"
+
+#We can only have one library in a project, but we can have multiple binaries!
+[[bin]]
+path = "src/main.rs"
+name = "zero2prod"
+
 [dependencies]
 axum = "0.6.20"
 serde = "1.0.188"
 tokio = {version = "1.32.0", features = ["macros", "rt-multi-thread"]}
+hyper = "0.14.27"
+
+# Dev dependencies are used exclusively when running tests or examples
+# They do not get included in the final application binary
+[dev-dependencies]
+reqwest = "0.11.22"
