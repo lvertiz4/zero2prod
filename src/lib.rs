@@ -1,3 +1,4 @@
+use std::net::TcpListener;
 use axum::{Router, routing::{get, IntoMakeService}, http::{Uri, StatusCode}, response::IntoResponse};
 use hyper::{Server, server::conn::AddrIncoming};
 
@@ -15,13 +16,14 @@ async fn health_check() -> StatusCode {
     StatusCode::OK
 }
 
-pub fn run() -> hyper::Result<Server<AddrIncoming, IntoMakeService<Router>>> {
+pub fn run(listener: TcpListener) -> hyper::Result<Server<AddrIncoming, IntoMakeService<Router>>> {
     let app = Router::new()
         .route("/", get(greet))
         .route("/:uri", get(greet))
         .route("/health_check", get(health_check));        
 
-    let server: Server<AddrIncoming, IntoMakeService<Router>> = axum::Server::bind(&"0.0.0.0:3000".parse().expect("Server did not start as expected"))
+    let server = axum::Server::from_tcp(listener)
+        .expect("Could not instantiate TcpListener")
         .serve(app.into_make_service());
 
     Ok(server)      
