@@ -2,36 +2,36 @@
 // You can inspect what code gets generated using
 // `cargo expand --test health_check` (<- name of the test file)
 
-use std::net::TcpListener;
 use sqlx::{PgConnection, Connection};
+use std::net::TcpListener;
 use zero2prod::configuration::get_configuration;
-
 use zero2prod::startup::run;
 
 //Launch instance of our application in the background
 fn spawn_app() -> String {
-    let listener = TcpListener::bind("127.0.0.1:0")
-    .expect("Could not retrieve TcpListener");
+    let listener = TcpListener::bind("127.0.0.1:0").expect("Could not retrieve TcpListener");
     // //Retrieve the port number assigned to us by the Operating System
-    let port = listener.local_addr().expect("Could not retrieve local address").port();
-    let server = run(listener)
-    .expect("Failed to bind to address");
+    let port = listener.
+        local_addr()
+        .expect("Could not retrieve local address")
+        .port();
+    let server = run(listener).expect("Failed to bind to address");
     // Launch the server as a background task
     // tokio::spawn returns a handle to the spawned future,
     // but we have no use for it here, hence the non-binding let
     let _ = tokio::spawn(server);
     //We return the application address to the caller
-   format!("http://127.0.0.1:{}", port)
+    format!("http://127.0.0.1:{}", port)
 }
 
 
 #[tokio::test]
 async fn health_check_works() {
-//     The test covers the full range of properties we are interested to check:
-//      • the health check is exposed at /health_check;
-//      • the health check is behind a GET method;
-//      • the health check always returns a 200;
-//      • the health check’s response has no body.
+    //     The test covers the full range of properties we are interested to check:
+    //      • the health check is exposed at /health_check;
+    //      • the health check is behind a GET method;
+    //      • the health check always returns a 200;
+    //      • the health check’s response has no body.
     //Instantiate app
     // spawn_app();
     //We need to bring in the Request library to instantiate an HTTP client to make requests against our application's Server
@@ -80,7 +80,6 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
 
     assert_eq!("saved.email", "lvertiz@gmail.com");
     assert_eq!("saved.name", "luis vertiz");
-
 }
 
 #[tokio::test]
@@ -101,7 +100,8 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
             .await
             .expect("Failed to execute POST Request");
         
-        assert_eq!(422, response.status().as_u16(),// Axum defaults to 422 instead of 400
+        assert_eq!(422,
+            response.status().as_u16(),// Axum defaults to 422 instead of 400
             //Additional customized error message on test failue
             "The API did not fail with 400 Bad Request when payload was {}.",
             error_message);
