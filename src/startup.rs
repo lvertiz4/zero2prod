@@ -2,12 +2,12 @@ use axum::{
     routing::{get, post, IntoMakeService}, 
     Router,
 };
-use hyper::{server::conn::AddrIncoming, Server,};
+use hyper::{server::conn::AddrIncoming, Server};
 use std::net::TcpListener;
 
 use crate::{
     greet,
-    routes::{health_check::health_check,subscriptions::subscribe}, 
+    routes::{health_check::health_check, subscriptions::subscribe}, 
 };
 
 pub fn run(listener: TcpListener) -> hyper::Result<Server<AddrIncoming, IntoMakeService<Router>>> {

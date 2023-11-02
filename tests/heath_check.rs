@@ -100,7 +100,7 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
             .expect("Failed to execute POST Request");
         assert_eq!(
             422,
-            response.status().as_u16(),// Axum defaults to 422 instead of 400
+            response.status().as_u16(), // Axum defaults to 422 instead of 400
             //Additional customized error message on test failue
             "The API did not fail with 400 Bad Request when payload was {}.",
             error_message
