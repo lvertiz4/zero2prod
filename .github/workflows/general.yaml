@@ -1,11 +1,15 @@
-#Name of my workflow. Github displays the bames of my workflow in my repository's 'Actions' tab
 name: Rust
+# Above is the name of my workflow. Github displays the names of my workflows in my repository's 'Actions' tab
+# Leaving a comment on the first line results in Github Actions thinking there is no name and listing the whole filename in the Actions tab
+
 #To automatically trigger the workflow
 # This example uses the push event, so a workflow run is triggered every time someone pushes a change to the repository or merges a pull request
 on: [push]
 
 env:
     CARGO_TEAM_COLOR: always
+    SQLX_VERSION: 0.7.2
+    SQLX_FEATURES: "rustls,postgres"
 
   # A workflow run is made up of one or more jobs, which may run in parallel by default
   # Each job runs in a runner environment specified by runs-on
@@ -16,6 +20,18 @@ jobs:
     name: Test
       # Containers must run in Linux based operating systems
     run-ons: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        # When you map ports using the 'ports' keyword, GitHub uses the --publish command to publish the container's specific ports to the Docker host
+        # Opens TCP Port 5432 on the host and service container
+        ports:
+          - 5432:5432
+    
     steps: 
         # Downloads a copy of the code in your repository before running CI tests
       - name: Check out code repository
@@ -30,9 +46,26 @@ jobs:
         # A Github Action that implements smart caching for rust/cargo projects with sensible defaults.
       - name: Rust Cache Action
           uses: Swatinem/rust-cache@v2
+          with:
+            key: sqlx-${{ env.SQLX_VERSION}}
+      - name: Install sqlx-cli
+        run:
+          cargo install sqlx-cli
+          --version=${{ env.SQLX_VERSION }}
+          --featues=${{ env.SQLX_FEATURES }}
+          --no-default-features
+          --locked
+          # The --locked flag can be used to force Cargo to use the packaged Cargo.lock file if it is available.
+          # This may be useful for ensuring reproducible buidls, to use the exact same set of dependencies that were available the package was published.
+          # It may also be useful if a newer version of a dependency is published that no longer builds on your system, or has other problems. 
+      - name: Install postgresql-client
+        run: sude apt-get update && sudo apt-get install postgresql-client -y
+
+      - name: Migrate database
+        run: SKIP_DOCKER=true ./scripts/init_db.sh
 
       - name: Run tests
-          run: cargp test
+          run: cargo test
 
   # 'fmt' container job
   fmt:
@@ -50,12 +83,34 @@ jobs:
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
         with: 
           components: clippy
       - uses: Swatinem/rust-clippy@v2
+        with:
+          key: sqlx-${{ env.SQLX_VERSION }}
+      - name: Install sqlx-cli
+        run:
+          cargo install sqlx-cli
+            --version=${{ env.SQLX_VERSION }}
+            --features ${{ env.SQLX_FEATURES }}
+            --no-default-features
+            --locked
+      - name: Install postgresql-client
+        run: sudo apt-get update && sudo apt-get install postgresql-client -y
+      - name: Migrate database
+        run: SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Linting
         run: cargo clippy -- -D warnings
 
@@ -63,12 +118,32 @@ jobs:
   coverage:
     name: Code coverage
     runs-on: ubuntu-latest
-    container:
-      image: xd009642/tarpaulin
-      options: --security-opt seccomp=unconfined
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Install postgresql-client
+        run: sudo apt-get update && sudo apt-get install postgresql-client -y
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: sqlx-${{ env.SQLX_VERSION }}
+      - name: Install sqlx-cli
+        run:
+          cargo install sqlx-cli
+          --version=${{ env.SQLX_VERSION }}
+          --features ${{ env.SQLX_FEATURES }}
+          --no-default-features
+          --locked
+      - name: Migrate database
+        run: SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Generate code coverage
         run: |
           cargo tarpaulin --verbose --workspace
