@@ -3,6 +3,10 @@
 // `cargo expand --test health_check` (<- name of the test file)
 
 use std::net::TcpListener;
+use sqlx::{PgConnection, Connection};
+use zero2prod::configuration::get_configuration;
+
+use zero2prod::startup::run;
 
 //Launch instance of our application in the background
 fn spawn_app() -> String {
@@ -10,7 +14,7 @@ fn spawn_app() -> String {
     .expect("Could not retrieve TcpListener");
     // //Retrieve the port number assigned to us by the Operating System
     let port = listener.local_addr().expect("Could not retrieve local address").port();
-    let server = zero2prod::run(listener)
+    let server = run(listener)
     .expect("Failed to bind to address");
     // Launch the server as a background task
     // tokio::spawn returns a handle to the spawned future,
@@ -49,6 +53,13 @@ async fn health_check_works() {
 async fn subscribe_returns_a_200_for_valid_form_data() {
     //Set up instance of web serve application and testing Client instance
     let app_address = spawn_app();
+    let configuration = get_configuration().expect("Failed to read configuration");
+    let connection_string = configuration.database.connection_string();
+    //The 'Connection' trait MUST be in scope for us to invoke
+    //'PgConnection::connect' - it is not an inherent method of the struct
+    let mut connection = PgConnection::connect(&connection_string)
+        .await
+        .expect("Failed to connect to Postgres");
     let client = reqwest::Client::new();
     //Act
     let body = "name=luis%20vertiz&email=lvertiz%40gmail.com";
@@ -61,6 +72,15 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
         .expect("Failed to execute subscription POST request");
     //Testing
     assert_eq!(200, response.status().as_u16());
+
+    let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
+        .fetch_one(&mut connection)
+        .await
+        .expect("Failed to fetch saved subscription.");
+
+    assert_eq!("saved.email", "lvertiz@gmail.com");
+    assert_eq!("saved.name", "luis vertiz");
+
 }
 
 #[tokio::test]
