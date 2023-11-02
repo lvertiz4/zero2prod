@@ -19,7 +19,7 @@ jobs:
       # Sets the name 'Test' for the job, which is displayed in the Github UI
     name: Test
       # Containers must run in Linux based operating systems
-    run-ons: ubuntu-latest
+    runs-ons: ubuntu-latest
     services:
       postgres:
         image: postgres:14
@@ -35,19 +35,19 @@ jobs:
     steps: 
         # Downloads a copy of the code in your repository before running CI tests
       - name: Check out code repository
-          uses: actions/checkout@v3
+        uses: actions/checkout@v3
           # This uses keyword specifics that this step will run v3 of the actions/checkout action.
           # This is an action that checks out your respository onto the runner, allowing you to run scripts or other actions against your code (such as build and test tools)
           # You should use the checkout action any time your workflows will run against the repository's code.
 
         # This Github Action installs a Rust toolchain using rustup. It is designed for one-line, concise usage and good defaults.
       - name: Install the Rust toolchina
-          uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@stable
         # A Github Action that implements smart caching for rust/cargo projects with sensible defaults.
       - name: Rust Cache Action
-          uses: Swatinem/rust-cache@v2
-          with:
-            key: sqlx-${{ env.SQLX_VERSION}}
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: sqlx-${{ env.SQLX_VERSION}}
       - name: Install sqlx-cli
         run:
           cargo install sqlx-cli
@@ -65,7 +65,7 @@ jobs:
         run: SKIP_DOCKER=true ./scripts/init_db.sh
 
       - name: Run tests
-          run: cargo test
+        run: cargo test
 
   # 'fmt' container job
   fmt:
