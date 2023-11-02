@@ -1,14 +1,13 @@
 use axum::{
-    routing::{IntoMakeService, get, post}, 
+    routing::{get, post, IntoMakeService}, 
     Router,
 };
-use hyper::{Server, server::conn::AddrIncoming};
+use hyper::{server::conn::AddrIncoming, Server,};
 use std::net::TcpListener;
 
 use crate::{
-    routes::{health_check::health_check,
-    subscriptions::subscribe}, 
     greet,
+    routes::{health_check::health_check,subscriptions::subscribe}, 
 };
 
 pub fn run(listener: TcpListener) -> hyper::Result<Server<AddrIncoming, IntoMakeService<Router>>> {
@@ -23,5 +22,4 @@ pub fn run(listener: TcpListener) -> hyper::Result<Server<AddrIncoming, IntoMake
         .serve(app.into_make_service());
 
     Ok(server)      
-   
 }
