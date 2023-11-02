@@ -1,7 +1,7 @@
 #Name of my workflow. Github displays the bames of my workflow in my repository's 'Actions' tab
 name: Rust
 #To automatically trigger the workflow
-# This example uses the push event, so a workflow run is triggered every time someone pushes a change to the repository or merges a pull request.
+# This example uses the push event, so a workflow run is triggered every time someone pushes a change to the repository or merges a pull request
 on: [push]
 
 env:
@@ -10,7 +10,7 @@ env:
   # A workflow run is made up of one or more jobs, which may run in parallel by default
   # Each job runs in a runner environment specified by runs-on
 jobs:
-  # Unique identifier of our job ('job-id')
+  # Unique identifier of our job ('test'/'fmt'/'clippy'/'coverage'= unique job in its own container)
   test:
       # Sets the name 'Test' for the job, which is displayed in the Github UI
     name: Test
@@ -27,8 +27,7 @@ jobs:
         # This Github Action installs a Rust toolchain using rustup. It is designed for one-line, concise usage and good defaults.
       - name: Install the Rust toolchina
           uses: dtolnay/rust-toolchain@stable
-       
-       # A Github Action that implements smart caching for rust/cargo projects with sensible defaults.
+        # A Github Action that implements smart caching for rust/cargo projects with sensible defaults.
       - name: Rust Cache Action
           uses: Swatinem/rust-cache@v2
 
