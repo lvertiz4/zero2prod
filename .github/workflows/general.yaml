@@ -1,41 +1,33 @@
 #Name of my workflow. Github displays the bames of my workflow in my repository's 'Actions' tab
 name: Rust
-
 #To automatically trigger the workflow
-on: 
-  # These settings allow us to run this specific CI pipline for PRs against chapter 3
-  push: 
-    branches:
-      -root-chapter-03-part0
-    pull_request:
-      types: [opened, synchronize, reopened]
-      branches: 
-        - root-chapter-03-part0
+# This example uses the push event, so a workflow run is triggered every time someone pushes a change to the repository or merges a pull request.
+on: [push]
 
-  env:
+env:
     CARGO_TEAM_COLOR: always
 
   # A workflow run is made up of one or more jobs, which may run in parallel by default
   # Each job runs in a runner environment specified by runs-on
-  jobs:
+jobs:
   # Unique identifier of our job ('job-id')
-    test:
+  test:
       # Sets the name 'Test' for the job, which is displayed in the Github UI
-      name: Test
+    name: Test
       # Containers must run in Linux based operating systems
-      run-ons: ubuntu-latest
-      steps: 
+    run-ons: ubuntu-latest
+    steps: 
         # Downloads a copy of the code in your repository before running CI tests
-        - name: Check out code repository
+      - name: Check out code repository
           # This uses keyword specifics that this step will run v3 of the actions/checkout action.
           # This is an action that checks out your respository onto the runner, allowing you to run scripts or other actions against your code (such as build and test tools)
           # You should use the checkout action any time your workflows will run against the repository's code.
 
         # A Github Action that implements smart caching for rust/cargo projects with sensible defaults.
-        - name: Rust Cache Action
+      - name: Rust Cache Action
           uses: Swatinem/rust-cache@v2
 
-        - name: Run tests
+      - name: Run tests
           run: cargp test
 
   # 'fmt' container job
