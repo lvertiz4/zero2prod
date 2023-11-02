@@ -112,7 +112,7 @@ jobs:
       - name: Migrate database
         run: SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Linting
-        run: cargo clippy 
+        run: cargo clippy -D clippy::all
 
   # "Coverage" container job - Will skip because Cargo Tarpaulin only runs on x86 processors, mine is apple ARM
   # coverage:
