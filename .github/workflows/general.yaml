@@ -3,7 +3,7 @@ name: Rust
 
 #To automatically trigger the workflow
 on: 
-  #These settings allow us to run this specific CI pipline for PRs against chapter 3
+  # These settings allow us to run this specific CI pipline for PRs against chapter 3
   push: 
     branches:
       -root-chapter-03-part0
