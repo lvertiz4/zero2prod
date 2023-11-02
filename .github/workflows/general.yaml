@@ -59,7 +59,7 @@ jobs:
           # This may be useful for ensuring reproducible buidls, to use the exact same set of dependencies that were available the package was published.
           # It may also be useful if a newer version of a dependency is published that no longer builds on your system, or has other problems. 
       - name: Install postgresql-client
-        run: sude apt-get update && sudo apt-get install postgresql-client -y
+        run: sudo apt-get update && sudo apt-get install postgresql-client -y
 
       - name: Migrate database
         run: SKIP_DOCKER=true ./scripts/init_db.sh
