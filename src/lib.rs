@@ -12,5 +12,5 @@ pub async fn greet(uri: Uri) -> impl IntoResponse {
     } else {
         let _ = name.remove(0);
         format!("Hello, {}!", &name)
-  }
+    }
 }
