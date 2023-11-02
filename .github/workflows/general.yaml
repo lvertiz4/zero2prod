@@ -19,7 +19,7 @@ jobs:
       # Sets the name 'Test' for the job, which is displayed in the Github UI
     name: Test
       # Containers must run in Linux based operating systems
-    runs-ons: ubuntu-latest
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:14
