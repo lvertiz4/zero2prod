@@ -6,6 +6,7 @@ use axum::{
 use hyper::{server::conn::AddrIncoming, Server};
 use sqlx::PgPool;
 use std::net::TcpListener;
+use tower_http::trace::TraceLayer;
 
 use crate::{
     greet,
@@ -22,7 +23,9 @@ pub fn run(
         .route("/health_check", get(health_check))
         .route("/subscriptions", post(subscribe))
         // Register the database connection as part of the application state
-        .layer(Extension(connection));
+        .layer(Extension(connection))
+        //TracerLayer initiates the tower_http::trace module middleware - see main.rs for env_logger init function
+        .layer(TraceLayer::new_for_http());
 
     let server = axum::Server::from_tcp(listener)
         .expect("Could not instantiate TcpListener")
