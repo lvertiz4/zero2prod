@@ -33,7 +33,7 @@ async fn spawn_app() -> TestApp {
     //We return the TestApp instance to the caller
     TestApp { 
         address,
-        db_pool: connection_pool
+        db_pool: connection_pool,
     }
 }
 
@@ -56,7 +56,6 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .expect("Failed to migrate the database.");
 
     connection_pool
-        
 }
 
 #[tokio::test]

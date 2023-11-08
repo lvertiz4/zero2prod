@@ -7,7 +7,6 @@ use hyper::{server::conn::AddrIncoming, Server};
 use sqlx::PgPool;
 use std::net::TcpListener;
 
-
 use crate::{
     greet,
     routes::{health_check::health_check, subscriptions::subscribe},
@@ -15,7 +14,7 @@ use crate::{
 
 pub fn run(
     listener: TcpListener,
-    connection: PgPool
+    connection: PgPool,
 ) -> hyper::Result<Server<AddrIncoming, IntoMakeService<Router>>> {
     let app = Router::new()
         .route("/", get(greet))

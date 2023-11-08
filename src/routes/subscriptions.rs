@@ -13,7 +13,7 @@ pub struct FormData {
 
 pub async fn subscribe(
     Extension(pool): Extension<PgPool>,
-     Form(form): Form<FormData>,
+    Form(form): Form<FormData>,
 ) -> StatusCode {
     let value = sqlx::query!(
         r#"
