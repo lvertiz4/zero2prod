@@ -31,7 +31,7 @@ async fn spawn_app() -> TestApp {
     // but we have no use for it here, hence the non-binding let
     let _ = tokio::spawn(server);
     //We return the TestApp instance to the caller
-    TestApp { 
+    TestApp {
         address,
         db_pool: connection_pool,
     }
