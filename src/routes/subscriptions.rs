@@ -1,4 +1,4 @@
-use axum::{Form, Extension};
+use axum::{Extension, Form};
 use chrono::Utc;
 use hyper::StatusCode;
 use serde::Deserialize;
@@ -11,7 +11,10 @@ pub struct FormData {
     name: String,
 }
 
-pub async fn subscribe(Extension(pool): Extension<PgPool>, Form(form): Form<FormData>,) -> StatusCode {
+pub async fn subscribe(
+    Extension(pool): Extension<PgPool>,
+     Form(form): Form<FormData>,
+) -> StatusCode {
     let value = sqlx::query!(
         r#"
         INSERT into subscriptions (id, email, name, subscribed_at)

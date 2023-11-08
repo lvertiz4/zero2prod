@@ -1,7 +1,7 @@
 use axum::{
     extract::Extension,
-    Router,
     routing::{get, post, IntoMakeService},
+    Router,
 };
 use hyper::{server::conn::AddrIncoming, Server};
 use sqlx::PgPool;
@@ -13,7 +13,10 @@ use crate::{
     routes::{health_check::health_check, subscriptions::subscribe},
 };
 
-pub fn run(listener: TcpListener, connection: PgPool) -> hyper::Result<Server<AddrIncoming, IntoMakeService<Router>>> {
+pub fn run(
+    listener: TcpListener,
+    connection: PgPool
+) -> hyper::Result<Server<AddrIncoming, IntoMakeService<Router>>> {
     let app = Router::new()
         .route("/", get(greet))
         .route("/:uri", get(greet))

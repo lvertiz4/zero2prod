@@ -3,8 +3,8 @@
 // `cargo expand --test health_check` (<- name of the test file)
 
 use sqlx::{Connection, Executor, PgConnection, PgPool};
-use uuid::Uuid;
 use std::net::TcpListener;
+use uuid::Uuid;
 use zero2prod::configuration::{get_configuration, DatabaseSettings};
 use zero2prod::startup::run;
 
@@ -31,14 +31,15 @@ async fn spawn_app() -> TestApp {
     // but we have no use for it here, hence the non-binding let
     let _ = tokio::spawn(server);
     //We return the TestApp instance to the caller
-  TestApp { address, db_pool: connection_pool }
+    TestApp { 
+        address,
+        db_pool: connection_pool
+    }
 }
 
 pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
     //create database
-    let mut connection = PgConnection::connect(
-        &config.connection_string_without_db()
-        )
+    let mut connection = PgConnection::connect(&config.connection_string_without_db())
         .await
         .expect("Failed to connect to Postgres");
     connection
