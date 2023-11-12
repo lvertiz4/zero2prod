@@ -24,7 +24,7 @@ pub fn run(
         .route("/subscriptions", post(subscribe))
         // Register the database connection as part of the application state
         .layer(Extension(connection))
-        //TracerLayer initiates the tower_http::trace module middleware - see main.rs for env_logger init function
+        //TracerLayer initiates the tower_http::trace module middleware - see main.rs for env_logger init function that delivers messages from tower_http which are wrapped within the Log crate API
         .layer(TraceLayer::new_for_http());
 
     let server = axum::Server::from_tcp(listener)

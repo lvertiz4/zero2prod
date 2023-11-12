@@ -4,6 +4,7 @@ use hyper::Uri;
 pub mod configuration;
 pub mod routes;
 pub mod startup;
+pub mod telemetry;
 
 pub async fn greet(uri: Uri) -> impl IntoResponse {
     let mut name = uri.path().to_owned();

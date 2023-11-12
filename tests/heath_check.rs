@@ -1,20 +1,47 @@
 // `tokio::test` is the testing equivalent of `tokio::main`.
 // You can inspect what code gets generated using
 // `cargo expand --test health_check` (<- name of the test file)
-
+use once_cell::sync::Lazy;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
 use uuid::Uuid;
 use zero2prod::configuration::{get_configuration, DatabaseSettings};
 use zero2prod::startup::run;
+use zero2prod::telemetry::{get_subscriber, init_subscriber};
 
 struct TestApp {
     pub address: String,
     pub db_pool: PgPool,
 }
 
+//Ensure that the 'tracing' stack is only initialized once using 'once_cell'
+static TRACING: Lazy<()> = Lazy::new( || {
+    let default_filter_level = "info".to_string();
+    let subscriber_name = "test".to_string();
+    // We cannot assign the output of 'get_subscriber' to a variable based on the value TEST_LOG because the sink is part of the type
+    // returned by 'get_subscriber', therefore they are not the same type.
+    if std::env::var("TEST_LOG").is_ok() {
+        let subscriber = get_subscriber(
+            subscriber_name,
+            default_filter_level,
+            std::io::stdout
+        );
+        init_subscriber(subscriber)
+    } else {
+        let subscriber = get_subscriber(
+            subscriber_name,
+            default_filter_level,
+            std::io::sink
+        );
+        init_subscriber(subscriber);
+    }
+});
+
 //Launch instance of our application in the background
 async fn spawn_app() -> TestApp {
+    //The first time 'initialize' in invoked the code in 'TRACING' in executed.
+    // All other invocations will instead skip execution.
+    Lazy::force(&TRACING);
     let listener = TcpListener::bind("127.0.0.1:0").expect("Could not retrieve TcpListener");
     // //Retrieve the port number assigned to us by the Operating System
     let port = listener
