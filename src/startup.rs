@@ -16,7 +16,7 @@ use crate::{
 pub fn run(
     listener: TcpListener,
     connection: PgPool,
-) -> hyper::Result<Server<AddrIncoming, IntoMakeService<Router>>> {
+) -> hyper::Result<Server<AddrIncoming, IntoMakeService<Router>>>  {
     let app = Router::new()
         .route("/", get(greet))
         .route("/:uri", get(greet))

@@ -11,11 +11,10 @@ async fn main() -> hyper::Result<()> {
     init_subscriber(subscriber);
     //Panic if we can't read the configuration
     let configuration = get_configuration().expect("Failed to read configuration");
-    let connection_pool = PgPool::connect(&configuration.database.connection_string().expose_secret())
-        .await
-        .expect("Failed to connect to Postgres");
+    let connection_pool = PgPool::connect_lazy(&configuration.database.connection_string().expose_secret())
+        .expect("Failed to creat Postgres connection pool.");
     //The Port number is now coming from the configuration file, rather than randomly selected by OS
-    let address = format!("127.0.0.1:{}", configuration.application_port);
+    let address = format!("{}:{}", configuration.application.host, configuration.application.port);
     let listener = TcpListener::bind(address).expect("Failed to bind to a random port");
     run(listener, connection_pool)?.await
 }

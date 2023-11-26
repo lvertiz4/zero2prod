@@ -20,7 +20,7 @@ name = "zero2prod"
 axum = "0.6.20"
 serde = {version = "1.0.188", features = ["derive"]}
 tokio = {version = "1.32.0", features = ["macros", "rt-multi-thread"]}
-hyper = "0.14.27"
+hyper = {version = "0.14.27", features = ["full"]}
 config = "0.13.3"
 uuid = {version = "1" , features = ["v4"]}
 chrono = {version = "0.4.22" , default-features = false, features = ["clock"]}
@@ -42,7 +42,8 @@ features = [
     "postgres",
     "uuid",
     "chrono",
-    "migrate"
+    "migrate",
+    #According to sqlx docs, 'offline' mode is not enabled by default and does not require a feature flag
 ]
 
 # Dev dependencies are used exclusively when running tests or examples
